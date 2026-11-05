@@ -24,6 +24,8 @@ public class TimerManager : MonoBehaviour
   public static event Action OnWorkSoon;
   public static event Action OnWorkStart;
   public static event Action OnMiddleWork;
+  public static event Action OnOpenHour;
+  public static event Action OnClosedHour;
 
   // Time variables
   [Header("Time Variables")]
@@ -35,7 +37,7 @@ public class TimerManager : MonoBehaviour
   [SerializeField] private float totalTime = 168; // total hours in a 7 day week
   [SerializeField] private float dayTimePeriod; // how long is one day
   [SerializeField] private float workStartTime = 9; // when work starts
-  [SerializeField] private float workEndTime = 17; // when work ends
+  [SerializeField] private float workEndTime = 22; // when work ends
   private (float startingTime, float endingTime) workPeriod;
 
   // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -68,6 +70,7 @@ public class TimerManager : MonoBehaviour
       currentTotalTime -= timeModifier;
       currentDayTime += timeModifier;
 
+      EventOpenOrClosed();
       EventTimeCheck();
 
       if (currentDayTime >= dayTimePeriod)
@@ -103,13 +106,13 @@ public class TimerManager : MonoBehaviour
       int roll = UnityEngine.Random.Range(1, workOverChance + 1);
       if (roll == workOverChance)
       {
-        print("work over event");
+        //print("work over event");
         OnWorkOver?.Invoke();
         return EventTimes.WorkOver;
       }
       else
       {
-        print($"work over failed: {roll}");
+        //print($"work over failed: {roll}");
       }
     }
 
@@ -119,13 +122,13 @@ public class TimerManager : MonoBehaviour
       int roll = UnityEngine.Random.Range(1, workSoonChance + 1);
       if (roll == workSoonChance)
       {
-        print("work soon event");
+        //print("work soon event");
         OnWorkSoon?.Invoke();
         return EventTimes.WorkSoon;
       }
       else
       {
-        print($"work soon failed: {roll}");
+        //print($"work soon failed: {roll}");
       }
     }
 
@@ -135,16 +138,28 @@ public class TimerManager : MonoBehaviour
       int roll = UnityEngine.Random.Range(1, middleWorkChance + 1);
       if (roll == middleWorkChance)
       {
-        print("middle work event");
+        //print("middle work event");
         OnMiddleWork?.Invoke();
         return EventTimes.MiddleWork;
       }
       else
       {
-        print($"middle day roll failed: {roll}");
+        //print($"middle day roll failed: {roll}");
       }
     }
     return null;
+  }
+
+  private void EventOpenOrClosed()
+  {
+    if (IsOpen())
+    {
+      OnOpenHour?.Invoke();
+    }
+    else
+    {
+      OnClosedHour?.Invoke();
+    }
   }
 
   private void NextDay()
@@ -159,4 +174,24 @@ public class TimerManager : MonoBehaviour
   {
     OnWeekOver?.Invoke();
   }
+
+  public float GetTotalTime()
+  {
+    return totalTime;
+  }
+
+  public float GetCurrentDayTime()
+  {
+    return currentDayTime;
+  }
+
+  public bool IsOpen()
+  {
+    if (currentDayTime >= workStartTime && currentDayTime <= workEndTime)
+    {
+      return true;
+    }
+    return false;
+  }
+
 }
