@@ -194,4 +194,13 @@ public class TimerManager : MonoBehaviour
     return false;
   }
 
+  public bool IsOpen(float time)
+  {
+    if (time >= workStartTime && time <= workEndTime)
+    {
+      return true;
+    }
+    return false;
+  }
+
 }
